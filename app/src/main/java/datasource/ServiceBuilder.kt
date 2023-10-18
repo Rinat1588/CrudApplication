@@ -1,5 +1,6 @@
 package datasource
 
+import interfaces.ApiPostInterface
 import interfaces.ApiUserInterface
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,9 +26,25 @@ class ServiceBuilder {
                 .build()
             return retrofit.create(ApiUserInterface::class.java)
         }
+        @Volatile
+        private var Post_INSTANCE: ApiPostInterface? = null
+        fun getPostService(): ApiPostInterface {
+            if (Post_INSTANCE == null) {
+                synchronized(this) {
+                    Post_INSTANCE = buildPostService()
+                }
+            }
+            return Post_INSTANCE!!
+        }
+        private fun buildPostService(): ApiPostInterface {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            return retrofit.create(ApiPostInterface::class.java)
+        }
+
     }
-
-
 
 
 }
